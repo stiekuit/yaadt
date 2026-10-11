@@ -71,3 +71,9 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Security notes (KAN-322, Oct 2026)
+- `freshdesk-proxy` needs a signed-in user (`verify_jwt = true`) and only allows the app's own Freshdesk operations (`supabase/functions/freshdesk-proxy/ops.ts`), each gated by a permission from `user_permissions` (admins always allowed). No DELETE, no free-form paths. Tests: `deno test supabase/functions/freshdesk-proxy/ops.test.ts`.
+- `send-access-request` stays public for the request-access form, but only emails about a stored request from the last 15 minutes, is rate-limited (3 per email per hour, 30 per hour overall) and escapes everything it puts in the email.
+- Both functions only allow browser calls from the origins in the `ALLOWED_ORIGINS` function secret (comma-separated). Set it before deploying: `supabase secrets set ALLOWED_ORIGINS=https://your-site,...`.
+- `freshdesk_config` can no longer be read by the anonymous role (migration `20261011120000_kan322_...`). Next step: make `api_key` unreadable from the browser entirely once the frontend stops selecting it.

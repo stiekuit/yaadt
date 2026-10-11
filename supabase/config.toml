@@ -8,8 +8,10 @@ schemas = ["public", "storage", "graphql_public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
+# KAN-322: the proxy needs a signed-in user. send-access-request stays public (the request-access form is used
+# before sign-up) but is rate-limited and validated in the function.
 [functions.freshdesk-proxy]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-access-request]
 verify_jwt = false
